@@ -4,8 +4,9 @@
     "\\DatingApp-SPA",
     "\\DatingApp-SPA\\src",
     "\\DatingApp-SPA\\src\\app",
-    "\\DatingApp-SPA\\src\\app\\messages"
+    "\\DatingApp-SPA\\src\\app\\members",
+    "\\DatingApp-SPA\\src\\app\\members\\photo-editor"
   ],
-  "SelectedNode": "\\DatingApp-SPA\\src\\app\\messages\\messages.component.html",
+  "SelectedNode": "\\DatingApp-SPA\\src\\app\\app.module.ts",
   "PreviewInSolutionExplorer": false
 }
