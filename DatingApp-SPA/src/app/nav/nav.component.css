@@ -5,3 +5,9 @@ a:hover {
 .dropdown-menu .dropdown-item:hover {
   color: #fff;
 }
+
+img {
+  max-height: 50px;
+  border: 2px solid white;
+  display: inline;
+}

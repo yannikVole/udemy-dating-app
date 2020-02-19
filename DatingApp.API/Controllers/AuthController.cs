@@ -1,14 +1,15 @@
-using System.Threading.Tasks;
-using DatingApp.API.Data;
-using DatingApp.API.Models;
-using Microsoft.AspNetCore.Mvc;
-using DatingApp.API.DTOs;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using DatingApp.API.Data;
+using DatingApp.API.DTOs;
+using DatingApp.API.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DatingApp.API.Controllers
 {
@@ -18,8 +19,10 @@ namespace DatingApp.API.Controllers
     {
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        private readonly IMapper _mapper;
+        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
         {
+            this._mapper = mapper;
             this._config = config;
             this._repo = repo;
 
@@ -28,7 +31,6 @@ namespace DatingApp.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDTO userForRegisterDTO)
         {
-            System.Diagnostics.Debug.WriteLine(System.Diagnostics.Debugger.IsAttached);
 
             userForRegisterDTO.Username = userForRegisterDTO.Username.ToLower();
 
@@ -37,14 +39,13 @@ namespace DatingApp.API.Controllers
                 return BadRequest("Username allready in use");
             }
 
-            var userToCreate = new User
-            {
-                Username = userForRegisterDTO.Username
-            };
+            var userToCreate = _mapper.Map<User>(userForRegisterDTO);
 
             var createdUser = await _repo.Register(userToCreate, userForRegisterDTO.Password);
 
-            return StatusCode(201);
+            var userToReturn = _mapper.Map<UserForDetailDTO>(createdUser);
+
+            return CreatedAtAction("GetUser", new { controller = "Users", id = createdUser.Id }, userToReturn);
         }
 
         [HttpPost("login")]
@@ -57,9 +58,9 @@ namespace DatingApp.API.Controllers
                 return Unauthorized();
             }
 
-            var claims = new[]{
-                new Claim(ClaimTypes.NameIdentifier,userFromRepo.Id.ToString()),
-                new Claim(ClaimTypes.Name, userFromRepo.Username)
+            var claims = new[] {
+                new Claim (ClaimTypes.NameIdentifier, userFromRepo.Id.ToString ()),
+                new Claim (ClaimTypes.Name, userFromRepo.Username)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
@@ -77,9 +78,12 @@ namespace DatingApp.API.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
+            var user = _mapper.Map<UserForListDTO>(userFromRepo);
+
             return Ok(new
             {
-                token = tokenHandler.WriteToken(token)
+                token = tokenHandler.WriteToken(token),
+                user = user
             });
         }
     }
