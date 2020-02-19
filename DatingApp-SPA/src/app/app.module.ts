@@ -16,7 +16,9 @@ import {
   BsDropdownModule,
   TabsModule,
   DatepickerModule,
-  BsDatepickerModule
+  BsDatepickerModule,
+  PaginationModule,
+  ButtonsModule
 } from "ngx-bootstrap";
 import { RouterModule } from "@angular/router";
 import { JwtModule } from "@auth0/angular-jwt";
@@ -70,12 +72,14 @@ export class CustomHammerConfig extends HammerGestureConfig {
     BrowserModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    ButtonsModule.forRoot(),
     BsDropdownModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot(appRoutes),
     TabsModule.forRoot(),
     BsDatepickerModule.forRoot(),
+    PaginationModule.forRoot(),
     JwtModule.forRoot({
       config: {
         tokenGetter,
